@@ -1,17 +1,23 @@
 # Paper
-Title: [A Unified Architecture for Natural Language Processing: Deep Neural Networks with Multitask Learning](https://ronan.collobert.com/pub/matos/2008_nlp_icml.pdf)
-Authors: [Ronan Collobert](https://ronan.collobert.com/) & [Jason Weston](http://www.thespermwhale.com/jaseweston/)
-Venue: International Conference of Machine Learning (ICML)
-Year: 2008
+* Title: [A Unified Architecture for Natural Language Processing: Deep Neural
+  Networks with Multitask
+  Learning](https://ronan.collobert.com/pub/matos/2008_nlp_icml.pdf)
+* Authors: [Ronan Collobert](https://ronan.collobert.com/) & [Jason
+  Weston](http://www.thespermwhale.com/jaseweston/)
+* Venue: International Conference of Machine Learning (ICML)
+* Year: 2008
 
 ---
+
 # Event
-Date: 2019-02-02 (Sat)
-Time: 14:00 - 16:00
-Location: [Kadokawa Hongo Building, 9F (角川本郷ビル)](https://goo.gl/maps/6u5BBf7ERE92)
-Meetup event: [link](https://www.meetup.com/Machine-Learning-Tokyo/events/258291603/) 
-Paper Reading lead: @jabalazs
-Scribe: N/A
+* Date: 2019-02-02 (Sat)
+* Time: 14:00 - 16:00
+* Location: [Kadokawa Hongo Building, 9F
+  (角川本郷ビル)](https://goo.gl/maps/6u5BBf7ERE92)
+* Meetup event:
+  [link](https://www.meetup.com/Machine-Learning-Tokyo/events/258291603/)
+* Paper Reading lead: @jabalazs
+* Scribe: N/A
 
 ---
 
