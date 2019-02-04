@@ -2,7 +2,7 @@
 
 Material for the Paper Reading sessions organized by Machine Learning Tokyo
 
-* Paper Reading Guidelines
+* [Paper Reading Guidelines](reading_guidelines.md)
 
 # Sessions
 
