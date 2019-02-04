@@ -1,0 +1,626 @@
+\documentclass[handout]{beamer} % Disable animations
+% \documentclass{beamer}
+\usefonttheme[onlymath]{serif}
+\usetheme{metropolis}
+\setbeamertemplate{section in toc}[sections numbered]
+\setbeamertemplate{subsection in toc}[subsections numbered]
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{outlines}
+\usepackage{extarrows}
+\usepackage{tikz-dependency}
+\usepackage{qtree}
+\usepackage{bm}
+\usepackage[
+    type={CC},
+    modifier={by-nc},
+    version={4.0},
+]{doclicense}
+
+% \usepackage{mhchem}
+% for \xrightleftharpoons
+\usepackage{mathtools}
+
+% \usepackage{lmodern}% http://ctan.org/pkg/lm
+% \usepackage{anyfontsize}
+
+\renewcommand\textbullet{\ensuremath{\bullet}}
+
+% Footnote with no number
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+\usepackage{setspace}
+\usepackage{etoolbox}
+\AtBeginEnvironment{quote}{\singlespacing\small}
+
+\input{math_commands.tex}
+
+% No footnote separator
+% \renewcommand*\footnoterule{}
+
+
+\title{\textbf{NLP Paper Reading 1}:\\
+A Unified Architecture for Natural Language
+Processing: Deep Neural Networks with Multitask Learning (2008)}
+
+% \date{\today}
+\date{February 2, 2019}
+\author{Jorge Balazs}
+\institute{\doclicenseImage[imagewidth=4em]}
+% \institute{}
+
+% \AtBeginSection[]{%
+%   \begin{frame}
+%     \frametitle{Contents}
+%     \tableofcontents[currentsection]
+%   \end{frame}
+% }
+
+\begin{document}
+  \maketitle
+
+  % \begin{frame}{Contents}
+  %   \tableofcontents
+  % \end{frame}
+
+  % \section{Introduction}
+  % \section{NLP Tasks}
+  % \section{General Deep Architecture for NLP}
+  %   \subsection{Transforming Indices into Vectors}
+  %   \subsection{Variable Sentence Length}
+  %   \subsection{Deep Architecture}
+  %   \subsection{Related Architectures}
+  % \section{Multitasking with Deep NN}
+  %   \subsection{Deep Joint Training}
+  %   \subsection{Previous Work in MLT for NLP}
+  % \section{Leveraging Unlabeled Data}
+  % \section{Experiments}
+  % \section{Conclusion}
+
+  \section{Paper Structure}
+  \begin{frame}{Paper Structure}
+      \begin{outline}[enumerate]
+        \1[] Abstract
+        \1 Introduction
+        \1 NLP Tasks
+        \1 General Deep Architecture for NLP
+          \2 Transforming Indices into Vectors
+          \2 Variable Sentence Length
+          \2 Deep Architecture
+          \2 Related Architectures
+        \1 Multitasking with Deep NN
+          \2 Deep Joint Training
+          \2 Previous Work in MLT for NLP
+        \1 Leveraging Unlabeled Data
+        \1 Experiments
+        \1 Conclusion
+      \end{outline}
+  \end{frame}
+
+  \section{Abstract}
+  \begin{frame}{Abstract}
+      \textbf{What}:
+      \begin{itemize}
+          \item Show that both \textit{multitask learning} (MTL) and
+              \textit{semi-supervised learning} improve the generalization of
+              shared tasks.
+      \end{itemize}
+      \textbf{How}:
+      \begin{itemize}
+          \item Network is trained \textit{jointly} on several NLP tasks.
+          \item Sentence $\xlongrightarrow{\text{input}}$ CNN Architecture
+              $\xlongrightarrow{\text{output}}$ host of NLP predictions.
+
+      \end{itemize}
+  \end{frame}
+
+
+  \section{Introduction}
+  \begin{frame}{Introduction - Background}
+      \begin{itemize}[<+->]
+          \item NLP = human language $\xlongrightarrow{}$ formal representation
+              understandable by computers.
+          \item Some applications: information extraction, machine translation,
+              summarization, search, human-computer interfaces.
+             \pause[\thebeamerpauses]\color{gray}Can you think of any others?
+             \pause%
+
+          \item Semantic understanding still is a far distant goal.
+              \pause[\thebeamerpauses]{\color{gray}This is still true today.}
+              \pause%
+
+              \begin{itemize}
+                  \item[] NLP is usually addressed by solving several
+                    \textit{syntactic} and \textit{semantic} subtasks (eg, POS
+                    tagging, syntactic parsing, and semantic-role labeling).
+              \end{itemize}
+
+          \item It is common to analyze these tasks separately.
+
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Introduction - Current Limitations}
+      \begin{itemize}[<+->]
+          \item Common failings of current approaches
+              \begin{enumerate}
+                  \item They are shallow, ie classifiers are linear.\pause[\thebeamerpauses]
+                      {\color{gray}What does this mean?}\pause%
+                  \item Linear classifiers need good hand-engineered
+                      features. \pause[\thebeamerpauses]{\color{gray}Why is
+                      this not desirable?}\pause%
+                  \item Features learned in different tasks are
+                      \textit{cascaded}, which propagates errors.
+              \end{enumerate}
+
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Introduction - Proposal}
+      A unified architecture that \textit{learns features} relevant to the tasks
+      at hand, with little prior knowledge.\pause%
+
+        \textbf{How?}\pause%
+
+    By \textit{jointly} training a Deep Neural Network for solving several NLP
+    tasks.\pause%
+
+    {\footnotesize\color{gray}The language model is an exception; we'll talk about this
+    later.}
+
+  \end{frame}
+
+  \begin{frame}{Introduction - Contributions}
+      They show that:
+      \begin{itemize}[<+->]
+          \item Multitask learning and semi-supervised learning significantly
+              improve performance of Semantic-role labeling, \textit{without
+              hand-engineered features}.
+          \item Combined tasks (MTL), and the unsupervised task (Language
+              Model), learn features that encode semantic information with no
+              other supervision than the labeled data from the tasks.
+          
+      \end{itemize}
+
+ \pause{}{\footnotesize\color{gray}Does this sound familiar? Remember this paper
+ was written more than 8 years ago, before AlexNet in 2012 and before the Deep
+ Learning wave.}
+
+  \end{frame}
+
+
+  \section{NLP Tasks}
+  \begin{frame}{Part-of-Speech Tagging (POS)}
+
+      \begin{center}
+          $\underset{\texttt{JJ}}{\text{Colorless}}$
+          $\underset{\texttt{JJ}}{\text{green}}$
+          $\underset{\texttt{NNS}}{\text{ideas}}$
+          $\underset{\texttt{VBP}}{\text{sleep}}$
+          $\underset{\texttt{RB}}{\text{furiously}}$
+      \end{center}
+      
+  \end{frame}
+
+  \begin{frame}{Chunking}
+      \begin{center}
+        \hspace{-2.7cm}
+        \Tree[.S
+        [.NP [.\texttt{JJ} Colorless ] [.\texttt{JJ} green ] [.\texttt{NNS} ideas ]]
+        [.VP [.\texttt{VBP} sleep ]
+        [.ADVP [.\texttt{RB} furiously ]]]
+        [.. . ]]
+      \end{center}
+  \end{frame}
+
+  \begin{frame}{Named Entity Recognition (NER)}
+      \begin{center}
+          $\underset{\text{PERSON}}{\text{Donal Trump}}$
+          joined
+          $\underset{\text{ORG}}{\text{Google}}$
+          as a researcher
+          $\underset{\text{DATE}}{\text{last monday}}$
+      \end{center}
+  \end{frame}
+
+  \begin{frame}{Semantic Role Labeling (SRL)}
+    \includegraphics[width=\textwidth]{imgs/SRL.png}
+    \blfootnote{\color{gray}\tiny\url{https://demo.allennlp.org/semantic-role-labeling/NTc2MzE2}}
+  \end{frame}
+
+  \begin{frame}{Language Models}
+      Predict the next word, given the previous words.
+   \begin{quote}
+     Language modeling is the task of assigning a probability to sentences in a
+     language [...]. Besides assigning a probability to each sequence of words, the
+     language models also assigns a probability for the likelihood of a given word
+     (or a sequence of words) to follow a sequence of words [...]
+     \cite{goldberg2017neural}.
+   \end{quote}  
+  \end{frame}
+
+  \begin{frame}{Semantically Related Words}
+      Predicting whether two words are semantically related:
+      \begin{itemize}
+          \item Mammal $\xrightleftharpoons[HYPONYM]{HYPERNYM}$ Cat
+              \vspace{0.5cm}
+          \item Car $\xrightleftharpoons[MERONYM]{HOLONYM}$ Wheel
+              \vspace{0.5cm}
+          \item PC $\xlongleftrightarrow{SYNONYM}$ Computer
+    \end{itemize}
+  \end{frame}
+
+
+  \section{General Deep Architecture for NLP}
+  \begin{frame}{General Deep Architecture for NLP - Traditional Approaches}
+      \begin{itemize}[<+->]
+
+         \item The previous tasks can all be seen as assigning labels to words.
+         \item The common approach is to manually transform input sentences into
+             vectors (feature engineering), and feed these vectors to a shallow
+             classifier (eg, SVM).
+         \item The choice of features (feature engineering), is an empirical
+             process dependent on the task at hand, mainly based on trial and
+             error, and difficult to scale.
+
+      \end{itemize}
+  \end{frame}
+
+
+  \begin{frame}{General Deep Architecture for NLP - Proposed Approach}
+      \begin{itemize}[<+->]
+
+          \item They propose a Deep Neural Network (NN) trained in an end-to-end
+              fashion.
+          \item Features (intermediate representations between the input and
+              output) are \textit{learned automatically} by the NN.
+
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Proposed Approach}
+      \begin{center}
+          \includegraphics[scale=0.25]{imgs/Architecture.png}
+      \end{center}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Transforming Indices into Vectors}
+      \begin{itemize}[<+->]
+          \item They assume a mapping between words and a set of indices
+              $\mathcal{D}$ which is a subset of the Natural numbers
+              ($\mathcal{D}\subset\mathbb{N}$).
+              \begin{itemize}
+                  \item $|\mathcal{D}|$ is the number of elements in
+                      $\mathcal{D}$, ie the words we ``know'' (words
+                      that appear in the training set).
+                  \item $\mathcal{D} = \{1, 2, \ldots, |\mathcal{D}|\}$
+              \end{itemize}
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Transforming Indices into Vectors}
+       \begin{itemize}[<+->]
+          \item They also define the relationship between these indices and an
+              \textit{embedding lookup table}.
+              \begin{itemize}
+
+                  \item This lookup table is simply a matrix $\mW$ where each column
+                     corresponds to a vector of dimension $d$ that represents
+                     one of the indices in $\mathcal{D}$. Therefore $\mW$
+                     has $d$ rows and $|\mathcal{D}|$ columns, and since it
+                     contains only real numbers we say that
+                     $\mW\in\sR^{d\times|\mathcal{D}|}$.
+                  \item $LT_W(i)$ is a function that takes an index $i$ in
+                      $\mathcal{D}$ as input, and returns the $i$-th column of
+                      $\mW$; a vector $\mW_i$ of dimension $d$ ($\mW_i\in\sR^d$).
+                 \item These vectors are learned during training.
+              \end{itemize}
+
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Transforming Indices into Vectors}
+       \begin{itemize}[<+->]
+          \item In general, we can have mappings between any kind of word-level
+              feature and a set of indices.
+              \begin{itemize}
+                  \item For example, capitalization of words is a feature.
+                      Our ``vocabulary'' of capitalization features is
+                      $\mathcal{D}^{cap}=\{1, 2\}$, where $1$ corresponds to
+                      non-capitalized and $2$ to capitalized.
+                 \item Similar to the embedding lookup table $\mW$ mentioned
+                     previously, we can define $\mW^{cap}\in\sR^{m\times
+                         2}$.\footnote[frame]{$m$ is the dimensionality we chose for these
+                     specific vectors, and $|\mathcal{D}^{cap}|=2$. Also
+                 note that $m$ does not necessarily equal $d$.}
+                 \item Equivalently, we will also have a mapping between the
+                     elements in $\mathcal{D}^{cap}$ and $\mW^{cap}$ given by
+                     $LT_{W^{cap}}(i)=\mW^{cap}_{i}$.
+              \end{itemize}
+
+      \end{itemize}
+     
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Transforming Indices into Vectors}
+       \begin{itemize}[<+->]
+
+         \item For each word, we will have several word-level features. For each of
+         these features we will have a single vector.
+     \item The representation of each word, will be the \textit{concatenation} of these
+           vectors.
+         \item For example, if we only consider the words themselves and their
+             capitalization (see previous slides), each word will be represented
+             by a vector $\in\sR^{m+d}$.
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+       \begin{itemize}[<+->]
+           \item Let's assume that we have a sequence $\{s_1, \ldots, s_n\}$ of
+               $n$ words, each with a corresponding vector
+               $\{\vx_1,\ldots,\vx_n\}$ obtained through the
+               procedure described earlier.
+           \item Each $\vx_i$ will have the same dimension, say
+               $d$, ie $\vx_i\in\sR^d$.\footnote[frame]{Not the
+               same $d$ mentioned earlier; just a redefinition.}
+           \item Clearly the number of vectors we end up with, $n$, depends on 
+               the length of the original sentence, however
+               NNs know only how to deal with fixed-length inputs.
+           % \item The solution the authors propose is to use a \textit{window
+           %     approach}. \pause%
+           %     {\color{gray}Actually this approach doesn't solve the
+           %     variable-length problem. What it does is to incorporate
+           %     neighborhood information into the vector representation of each
+           %     word.}
+      \end{itemize}
+      \begin{center}
+          \pause[\thebeamerpauses]How do we solve this problem?
+      \end{center}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+      \begin{itemize}[<+->]
+          \item A simple approach is to use \textit{window approach} with a
+              window size of $ksz$. \pause[\thebeamerpauses]{\color{gray}What
+              exactly do they mean by a window approach?}
+          \item This approach works well for modeling local phenomena, which
+                  is beneficial for tasks such as POS tagging.
+          \item It fails, however, when modeling long-range dependencies, which
+              is required for more complex tasks such as SRL.
+      \end{itemize}
+
+ \pause[\thebeamerpauses]{\color{gray}Why is it ok to model local phenomena in
+ POS tagging but not in SRL?}
+
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+      \begin{itemize}[<+->]
+          \item An alternative approach is to use Time-Delay Neural Networks
+              (roughly equivalent to CNNs), which are capable of modeling
+              long-range dependencies.
+            \item $\vo(t)=\sum_{j=1-t}^{n-t}{\mL_j \cdot \vx_{t+j}}$, where
+                $\mL_j\in\sR^{n_{hu}\times d}$. Remember that our word vectors
+                $\vx_t\in\sR^d$, which means that $\vo(t)\in\sR^{n_{hu}}$ for
+                every $t$.
+
+      \end{itemize}
+
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+      \begin{centering}
+          \vspace{-1.8cm}
+          $$\vo(t)=\sum_{j=1-t}^{n-t}{\mL_j \cdot \vx_{t+j}}$$
+          \vspace{-0.5cm}
+          \begin{itemize}[<+->]
+              % \item[] $\vo(0)=\sum_{j=1}^{n}{\mL_j\cdot\vx_{0+j}}=\mL_1\vx_1+\mL_2\vx_2+\ldots+\mL_n\vx_n$
+              \item[] $\vo(1)=\sum_{j=0}^{n-1}{\mL_j\cdot\vx_{1+j}}=\mL_0\vx_1+\mL_1\vx_2+\ldots+\mL_{n-1}\vx_n$
+              \item[] $\vo(2)=\sum_{j=-1}^{n-2}{\mL_j\cdot\vx_{2+j}}=\mL_{-1}\vx_1+\mL_0\vx_2+\ldots+\mL_{n-2}\vx_n$
+              \item[] \hspace{5cm}\vdots
+              \item[] $\vo(t)=\sum_{j=1-t}^{n-t}{\mL_j\cdot\vx_{t+j}}=\mL_{1-t}\vx_1+\mL_{2-t}\vx_2+\ldots+\mL_{n-t}\vx_n$
+              \item[] \hspace{5cm}\vdots
+              \item[] $\vo(n)=\sum_{j=1-n}^{0}{\mL_j\cdot\vx_{n+j}}=\mL_{1-n}\vx_1+\mL_{2-n}\vx_2+\ldots+\mL_{0}\vx_n$
+
+      \end{itemize}
+          
+      \end{centering}
+
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+
+    Let's call the window size $w$, i.e., $w=ksz$. We impose
+    $\mL_j=\bm{0}\enspace$ if $|j|>\frac{(w-1)}{2}$, or, in other words, $\mL_j$
+    will be non-zero iff
+    
+    $$\enspace-\frac{(w-1)}{2} \leq j \leq \frac{(w-1)}{2}$$
+
+    \pause Let's set $w=3$, i.e., $\mL_j\neq\bm{0}\enspace$
+    if $\enspace-1 \leq j \leq 1$
+
+    \pause Our convolution operation becomes:
+    $$\vo(t)=\sum_{-1 \leq j \leq 1}{\mL_j \cdot \vx_{t+j}}$$
+
+    \pause Which means that each sum will have only $w=3$ elements.
+
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+
+    $$\vo(t)=\sum_{-1 \leq j \leq 1}{\mL_j \cdot \vx_{t+j}}$$
+
+      \begin{centering}
+          \begin{itemize}[<+->]
+              % \item[] $\vo(0)=\mL_{-1}\vx_{-1}+\mL_0\vx_0+\mL_1\vx_1$
+              \item[] $\vo(1)=\mL_{-1}\vx_{0}+\mL_0\vx_{1}+\mL_1\vx_2$
+              \item[] $\vo(2)=\mL_{-1}\vx_{1}+\mL_0\vx_{2}+\mL_1\vx_3$
+              \item[] \hspace{2.7cm}\vdots
+              \item[] $\vo(t)=\mL_{-1}\vx_{t-1}+\mL_0\vx_{t}+\mL_1\vx_{t+1}$
+              \item[] \hspace{2.7cm}\vdots
+              \item[] $\vo(n-1)=\mL_{-1}\vx_{n-2}+\mL_0\vx_{n-1}+\mL_1\vx_{n}$
+              \item[] $\vo(n)=\mL_{-1}\vx_{n-1}+\mL_0\vx_{n}+\mL_1\vx_{n+1}$
+         \end{itemize}
+      \end{centering}
+  \end{frame}
+
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+      \begin{itemize}[<+->]
+          \item Before the TDNN we had $n$ word vectors
+           $\{\vx_1,\ldots,\vx_n\},\enspace\vx_t\in\sR^d$; one for each word of
+           our sequence, obtained from a lookup embedding table.
+       \item After the TDNN, we have $n$ vectors $\{\vo_1,\ldots,\vo_n\},
+           \enspace\vo_t\in\sR^{n_{hu}}$, still one for each word of our
+           sequence, where each $\vo_t$ encodes a notion of its
+           neighborhood.
+       \item Also note that the previous statement is true independently of the
+           window size we chose.
+       \item This allows to easily pass the output to the first TDNN to another
+           TDNN with different parameters and maybe a different window size
+           (what the authors refer to as \textit{stacking}).
+
+        
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Variable Sentence Length}
+      \begin{itemize}[<+->]
+
+        \item After the previous steps we still have $n$ vectors though.
+            To obtain a single vector for representing the sentence the authors
+            use a ``Max'' Layer (aka maxpooling), over the sequence dimension.
+        \item The maxpooling operation reduces the sequence dimension and
+            returns a single vector $\vo\in\sR^{n_{hu}}$ representing the whole
+            sentence.
+        \item This sentence representation can then be passed to a Feedforward
+            (aka dense) NN layer.
+          \item Finally, they encode the position of the word to be labelled
+              with an additional lookup table $LT^{dist_w}(i-pos_w)$.
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{General Deep Architecture for NLP - Deep Architecture}
+      \begin{itemize}[<+->]
+          \item This part describes how they transform the maxpooled output of
+              the TDNN $\vo\in\sR^{n_{hu}}$ into a vector $\vo^{last}\in\sR^k$
+              where $k$ is the number of classes in the NLP classification task,
+              for example, the number of possible POS tags.
+          \item Finally, $\vo^{last}\in\sR^k$ is fed to a softmax layer, which
+              returns a vector representing a probability distribution over the
+              possible classes: $\vp\in\sR^k$, where $0\leq\vp_i\leq1$ and
+              $\sum_{i=1}^k{\vp_i}=1$
+      \end{itemize}
+  \end{frame}
+
+  \section{Multitasking with Deep NN}
+
+  \begin{frame}{Multitasking with Deep NN}
+  \begin{quote}
+    Multitask learning is the procedure of learning several tasks at the same
+    time with the aim of mutual benefit.
+  \end{quote}
+
+  % \begin{center}
+  %     \pause{\color{gray}How can doing this benefit the learning procedure?}
+  % \end{center}
+  \end{frame}
+
+  \begin{frame}{Multitasking with Deep NN - Deep joint Training}
+      \begin{itemize}[<+->]
+          \item The benefit comes from learning features (representations) that
+              are beneficial for several tasks (\textit{more general} features).
+          \item Usually, POS predictions are often used for solving
+              the NER and SRL tasks. Having good representations for POS
+              tagging, might improve both NER and SRL.
+          \item Earliest layers (lookup tables) implicitly learn relevant word
+              representations for each word. It's reasonable to expect that
+              these features will perform well in related tasks.
+          \item Earlier layers can be shared accross tasks while later ones can
+              be task-specific.
+      \end{itemize}
+      
+  \end{frame}
+
+  \begin{frame}{Multitasking with Deep NN - Deep joint Training}
+      \begin{itemize}[<+->]
+          \item Their model is trained one example at a time.
+          \item At each iteration
+              they pick a random example from a random task, feed it forward,
+              obtain the loss, calculate the gradients, and backpropagate them.
+      \end{itemize}
+
+      \begin{center}
+        \pause[\thebeamerpauses]\includegraphics[scale=0.2]{imgs/sharing.png}
+      \end{center}
+      
+  \end{frame}
+
+
+  \section{Leveraging Unlabeled Data}
+  \begin{frame}{Leveraging Unlabeled Data}
+      \begin{itemize}[<+->]
+          \item Labeling is expensive.
+          \item Leveraging unlabeled data in NLP seems like a good idea.
+              \pause{\color{gray}10 years later this still rings true.}
+      \end{itemize}
+      
+  \end{frame}
+
+  \begin{frame}{Leveraging Unlabeled Data - Language Model}
+      \begin{itemize}[<+->]
+          \item $2$-class classification task: Predict whether the middle word
+              of a window is related to its context or not.
+          \item Training dataset was built from Wikipedia. Positive examples are
+              real extracts from Wikipedia, negative ones are the same ones but
+              with the middle word replaced by a random one.
+          \item Ranking-type (hinge) loss:
+              $$\sum_{s\in\mathcal{S}}\sum_{w\in\mathcal{D}}\max(0,1-f(s)+f(s^w))$$
+              $\mathcal{S}$ is the set of sentence windows, and $\mathcal{D}$ the
+              set of words in the vocabulary.
+      \end{itemize}
+  \end{frame}
+
+  \begin{frame}{Leveraging Unlabeled Data - Language Model}
+      Word representations learned by this model cluster for semantically-similar
+      words. In other words, the embedding space learned by this model encodes
+      semantic similarity.
+      \begin{center}
+        \pause[\thebeamerpauses]\includegraphics[scale=0.2]{imgs/wordsim.png}
+      \end{center}
+  \end{frame}
+
+  \section{Experiments}
+  \begin{frame}{Experiments - Results}
+      \hspace{-0.5cm}\includegraphics[scale=0.18]{imgs/results.png}
+  \end{frame}
+  \begin{frame}{Experiments - Results}
+      \hspace{-0.6cm}\includegraphics[scale=0.18]{imgs/resultgraphs.png}
+  \end{frame}
+  \section{Conclusion}
+  \begin{frame}{Conclusion}
+      \begin{itemize}
+          \item They showed a deep NN for NLP.
+          \item Architecture is extremely fast.
+          \item Architecture can be applied to several tasks.
+          \item \textbf{Learning tasks simultaneously improved generalization
+                  performance.}
+          \item Achieved state of the art in SRL when training this task jointly
+              with their language model \textit{without any explicit syntactic
+              features}.
+      \end{itemize}
+  \end{frame}
+
+  \section{Discussion}
+
+\bibliographystyle{emnlp_natbib}
+\bibliography{bibliography}
+\end{document}
