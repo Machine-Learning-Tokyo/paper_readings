@@ -9,7 +9,7 @@ Material for the Paper Reading sessions organized by Machine Learning Tokyo, pre
 ## NLP
 
 1. [A Unified Architecture for Natural Language processing: Deep Neural Networks
-   with Multitask Learning](NLP/1_a_unified_architecture/README.md) presented by Jorge Balasz
+   with Multitask Learning](NLP/1_a_unified_architecture/README.md) presented by Jorge Balazs
 
 2. [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/abs/1409.0473) presented by Jorge Balazs
 
